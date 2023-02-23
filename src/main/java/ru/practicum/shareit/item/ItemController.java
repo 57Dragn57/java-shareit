@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validated.Create;
 import ru.practicum.shareit.validated.Update;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -33,7 +32,7 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ItemDto itemUpdate(@RequestHeader("X-Sharer-User-Id") int userId, @Validated(Update.class)
-                              @RequestBody ItemDto itemDto, @PathVariable int itemId) {
+    @RequestBody ItemDto itemDto, @PathVariable int itemId) {
         log.info("Обновление предмета");
         return itemService.itemUpdate(itemDto, itemId, userId);
     }
