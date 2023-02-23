@@ -7,18 +7,15 @@ import ru.practicum.shareit.user.User;
 
 import java.util.Objects;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
 public class Item {
-    int id;
-    String name;
-    String description;
-    boolean available;
-    User owner;
-    ItemRequest request;
+    private int id;
+    private String name;
+    private String description;
+    private Boolean available;
+    private User owner;
+    private ItemRequest request;
 
     @Override
     public boolean equals(Object obj) {

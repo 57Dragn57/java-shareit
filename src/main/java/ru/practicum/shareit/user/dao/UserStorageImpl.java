@@ -2,11 +2,7 @@ package ru.practicum.shareit.user.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ServerErrorException;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,36 +16,29 @@ public class UserStorageImpl implements UserStorage {
     private int id = 1;
 
     @Override
-    public UserDto create(UserDto userDto) {
-        mailValid(userDto);
-        User user = UserMapper.toUser(userDto);
+    public User create(User user) {
+        mailValid(user);
         user.setId(id);
         userMap.put(id, user);
         id++;
-        return UserMapper.toUserDto(user);
+        return user;
     }
 
     @Override
-    public UserDto update(UserDto userDto, int userId) {
-        userDto.setId(userId);
-        mailValid(userDto);
-        try {
-            if (!userDto.getEmail().isBlank()) {
-                userMap.get(userId).setEmail(userDto.getEmail());
-            }
-        } catch (Exception e) {
-            log.info("Пустое значение электронной почты пользователя");
-        }
+    public User update(User user, int userId) {
+        User u =  userMap.get(userId);
+        user.setId(userId);
+        mailValid(user);
 
-        try {
-            if (!userDto.getName().isBlank()) {
-                userMap.get(userId).setName(userDto.getName());
+            if (user.getEmail() != null) {
+                u.setEmail(user.getEmail());
             }
-        } catch (Exception e) {
-            log.info("Пустое значение имени пользователя");
-        }
 
-        return UserMapper.toUserDto(userMap.get(userId));
+            if (user.getName() != null) {
+                u.setName(user.getName());
+            }
+
+        return u;
     }
 
     @Override
@@ -58,28 +47,24 @@ public class UserStorageImpl implements UserStorage {
     }
 
     @Override
-    public UserDto getUser(int id) {
+    public User getUser(int id) {
         if (userMap.containsKey(id)) {
-            return UserMapper.toUserDto(userMap.get(id));
+            return userMap.get(id);
         } else {
-            throw new NotFoundException("Пользователя не существует");
+            throw new NullPointerException("Пользователя не существует");
         }
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        List<UserDto> dtoUsers = new ArrayList<>();
-        for (User u : userMap.values()) {
-            dtoUsers.add(UserMapper.toUserDto(u));
-        }
-        return dtoUsers;
+    public List<User> getAllUsers() {
+        return new ArrayList<>(userMap.values());
     }
 
-    private void mailValid(UserDto userDto) {
+    private void mailValid(User user) {
         for (User u : userMap.values()) {
-            if (u.getEmail().equals(userDto.getEmail())) {
-                if (u.getId() != userDto.getId()) {
-                    throw new ServerErrorException("Пользователь с таким адресом эл.почты уже существует");
+            if (u.getEmail().equals(user.getEmail())) {
+                if (u.getId() != user.getId()) {
+                    throw new IllegalArgumentException("Пользователь с таким адресом эл.почты уже существует");
                 }
             }
         }

@@ -2,83 +2,68 @@ package ru.practicum.shareit.item.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
 public class ItemStorageImpl implements ItemStorage {
     private final Map<Integer, Item> itemsMap = new HashMap<>();
+    private final Map<Integer, List<Item>> userItemIndex = new LinkedHashMap<>();
     private int id = 1;
 
     @Override
-    public ItemDto addItem(ItemDto itemDto, User user) {
-        @Valid Item item = ItemMapper.toItem(itemDto);
+    public Item addItem(Item item, User user) {
         item.setOwner(user);
         item.setId(id);
         itemsMap.put(id, item);
         id++;
-        return ItemMapper.toItemDto(item);
+        final List<Item> items = userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
+        items.add(item);
+        return item;
     }
 
     @Override
-    public ItemDto itemUpdate(ItemDto itemDto, int itemId, int userId) {
-        if (itemsMap.get(itemId).getOwner().getId() == userId) {
-            try {
-                if (itemDto.getAvailable() != null) {
-                    itemsMap.get(itemId).setAvailable(itemDto.getAvailable());
-                }
-            } catch (Exception e) {
-                log.info("Передано пустое значение поля доступа");
+    public Item itemUpdate(Item item, int itemId, int userId) {
+        Item i = itemsMap.get(itemId);
+        if (i.getOwner().getId() == userId) {
+
+            if (item.getAvailable() != null) {
+                i.setAvailable(item.getAvailable());
             }
 
-            try {
-                if (!itemDto.getDescription().isBlank()) {
-                    itemsMap.get(itemId).setDescription(itemDto.getDescription());
-                }
-            } catch (Exception e) {
-                log.info("Передано пустое значение поля с описанием");
+            if (item.getDescription() != null) {
+                i.setDescription(item.getDescription());
             }
 
-            try {
-                if (!itemDto.getName().isBlank()) {
-                    itemsMap.get(itemId).setName(itemDto.getName());
-                }
-            } catch (Exception e) {
-                log.info("Передано пустое значение поля и именем");
+            if (item.getName() != null) {
+                i.setName(item.getName());
             }
 
-            return ItemMapper.toItemDto(itemsMap.get(itemId));
+            return i;
         } else {
-            throw new NotFoundException("Пользователь не является владельцем предмета");
+            throw new NullPointerException("Пользователь не является владельцем предмета");
         }
     }
 
     @Override
-    public ItemDto getItemById(int id) {
+    public Item getItemById(int id) {
         if (itemsMap.containsKey(id)) {
-            return ItemMapper.toItemDto(itemsMap.get(id));
+            return itemsMap.get(id);
         } else {
-            throw new NotFoundException("Такого предмета не существует");
+            throw new NullPointerException("Такого предмета не существует");
         }
     }
 
     @Override
-    public List<ItemDto> getItemsByUser(int id) {
-        List<ItemDto> userItems = new ArrayList<>();
+    public List<Item> getItemsByUser(int id) {
+        List<Item> userItems = new ArrayList<>();
 
         for (Item i : itemsMap.values()) {
             if (i.getOwner().getId() == id) {
-                userItems.add(ItemMapper.toItemDto(i));
+                userItems.add(i);
             }
         }
 
@@ -86,17 +71,17 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
-        List<ItemDto> items = new ArrayList<>();
+    public List<Item> search(String text) {
+        List<Item> items = new ArrayList<>();
 
         if (text.isBlank()) {
             return items;
         }
 
         for (Item i : itemsMap.values()) {
-            if (i.isAvailable()) {
+            if (i.getAvailable()) {
                 if (i.getName().toLowerCase().contains(text.toLowerCase()) || i.getDescription().toLowerCase().contains(text.toLowerCase())) {
-                    items.add(ItemMapper.toItemDto(i));
+                    items.add(i);
                 }
             }
         }

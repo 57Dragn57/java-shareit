@@ -3,16 +3,16 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.validated.Create;
+import ru.practicum.shareit.validated.Update;
 
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @Slf4j
 @RequestMapping("/items")
@@ -26,13 +26,13 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") int userId, @Valid @RequestBody ItemDto itemDto) {
+    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") int userId, @Validated(Create.class) @RequestBody ItemDto itemDto) {
         log.info("Добавление нового предмета");
         return itemService.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto itemUpdate(@RequestHeader("X-Sharer-User-Id") int userId,
+    public ItemDto itemUpdate(@RequestHeader("X-Sharer-User-Id") int userId, @Validated(Update.class)
                               @RequestBody ItemDto itemDto, @PathVariable int itemId) {
         log.info("Обновление предмета");
         return itemService.itemUpdate(itemDto, itemId, userId);
