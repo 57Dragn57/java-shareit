@@ -11,14 +11,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionController {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NullPointerException.class)
-    public void notFoundException(NullPointerException e) {
+    @ExceptionHandler(ValidationException.class)
+    public void validationException(ValidationException e) {
         log.info(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public void serverErrorException(IllegalArgumentException e) {
+    @ExceptionHandler(ServerErrorException.class)
+    public void serverErrorException(ServerErrorException e) {
+        log.info(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(OtherExceptions.class)
+    public void otherExceptions(OtherExceptions e){
         log.info(e.getMessage());
     }
 }

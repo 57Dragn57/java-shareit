@@ -31,18 +31,10 @@ public class ItemService {
     }
 
     public List<ItemDto> getItemsByUser(int id) {
-        List<ItemDto> itemDtoList = new ArrayList<>();
-        for (Item i : itemStorage.getItemsByUser(id)) {
-            itemDtoList.add(ItemMapper.toItemDto(i));
-        }
-        return itemDtoList;
+        return ItemMapper.itemDtoList(itemStorage.getItemsByUser(id));
     }
 
     public List<ItemDto> search(String text) {
-        List<ItemDto> itemDtoList = new ArrayList<>();
-        for (Item i : itemStorage.search(text)) {
-            itemDtoList.add(ItemMapper.toItemDto(i));
-        }
-        return itemDtoList;
+        return ItemMapper.itemDtoList(itemStorage.search(text));
     }
 }

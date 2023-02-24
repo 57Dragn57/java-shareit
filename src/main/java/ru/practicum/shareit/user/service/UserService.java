@@ -9,6 +9,7 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +33,6 @@ public class UserService {
     }
 
     public List<UserDto> getAllUsers() {
-        List<UserDto> userDtosList = new ArrayList<>();
-        for (User u : userStorage.getAllUsers()) {
-            userDtosList.add(UserMapper.toUserDto(u));
-        }
-        return userDtosList;
+        return userStorage.getAllUsers().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 }

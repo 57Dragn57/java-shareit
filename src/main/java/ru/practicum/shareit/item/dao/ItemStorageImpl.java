@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
@@ -34,17 +35,17 @@ public class ItemStorageImpl implements ItemStorage {
                 i.setAvailable(item.getAvailable());
             }
 
-            if (item.getDescription() != null) {
+            if (item.getDescription() != null && !item.getDescription().isBlank()) {
                 i.setDescription(item.getDescription());
             }
 
-            if (item.getName() != null) {
+            if (item.getName() != null && !item.getName().isBlank()) {
                 i.setName(item.getName());
             }
 
             return i;
         } else {
-            throw new NullPointerException("Пользователь не является владельцем предмета");
+            throw new ValidationException("Пользователь не является владельцем предмета");
         }
     }
 
@@ -53,30 +54,18 @@ public class ItemStorageImpl implements ItemStorage {
         if (itemsMap.containsKey(id)) {
             return itemsMap.get(id);
         } else {
-            throw new NullPointerException("Такого предмета не существует");
+            throw new ValidationException("Такого предмета не существует");
         }
     }
 
     @Override
     public List<Item> getItemsByUser(int id) {
-        List<Item> userItems = new ArrayList<>();
-
-        for (Item i : itemsMap.values()) {
-            if (i.getOwner().getId() == id) {
-                userItems.add(i);
-            }
-        }
-
-        return userItems;
+        return userItemIndex.getOrDefault(id, List.of());
     }
 
     @Override
     public List<Item> search(String text) {
         List<Item> items = new ArrayList<>();
-
-        if (text.isBlank()) {
-            return items;
-        }
 
         for (Item i : itemsMap.values()) {
             if (i.getAvailable()) {

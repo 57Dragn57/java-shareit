@@ -4,6 +4,9 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @UtilityClass
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
@@ -24,5 +27,9 @@ public class ItemMapper {
                 .available(itemDto.getAvailable())
                 .build();
         return item;
+    }
+
+    public static List<ItemDto> itemDtoList(List<Item> items){
+        return items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 }

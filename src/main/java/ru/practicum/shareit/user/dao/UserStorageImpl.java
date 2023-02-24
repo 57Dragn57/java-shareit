@@ -2,6 +2,8 @@ package ru.practicum.shareit.user.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.exception.ServerErrorException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
@@ -26,17 +28,17 @@ public class UserStorageImpl implements UserStorage {
 
     @Override
     public User update(User user, int userId) {
-        User u =  userMap.get(userId);
+        User u = userMap.get(userId);
         user.setId(userId);
-        mailValid(user);
 
-            if (user.getEmail() != null) {
-                u.setEmail(user.getEmail());
-            }
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            mailValid(user);
+            u.setEmail(user.getEmail());
+        }
 
-            if (user.getName() != null) {
-                u.setName(user.getName());
-            }
+        if (user.getName() != null && !user.getName().isBlank()) {
+            u.setName(user.getName());
+        }
 
         return u;
     }
@@ -51,7 +53,7 @@ public class UserStorageImpl implements UserStorage {
         if (userMap.containsKey(id)) {
             return userMap.get(id);
         } else {
-            throw new NullPointerException("Пользователя не существует");
+            throw new ValidationException("Пользователя не существует");
         }
     }
 
@@ -64,7 +66,7 @@ public class UserStorageImpl implements UserStorage {
         for (User u : userMap.values()) {
             if (u.getEmail().equals(user.getEmail())) {
                 if (u.getId() != user.getId()) {
-                    throw new IllegalArgumentException("Пользователь с таким адресом эл.почты уже существует");
+                    throw new ServerErrorException("Пользователь с таким адресом эл.почты уже существует");
                 }
             }
         }
