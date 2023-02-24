@@ -29,7 +29,7 @@ public class ItemMapper {
         return item;
     }
 
-    public static List<ItemDto> itemDtoList(List<Item> items){
+    public static List<ItemDto> itemDtoList(List<Item> items) {
         return items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 }

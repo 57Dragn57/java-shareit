@@ -5,11 +5,9 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dao.ItemStorage;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

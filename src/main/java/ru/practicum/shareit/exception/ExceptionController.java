@@ -24,7 +24,7 @@ public class ExceptionController {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(OtherExceptions.class)
-    public void otherExceptions(OtherExceptions e){
+    public void otherExceptions(OtherExceptions e) {
         log.info(e.getMessage());
     }
 }

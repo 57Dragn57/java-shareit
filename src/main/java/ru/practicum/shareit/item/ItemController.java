@@ -52,9 +52,9 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
         log.info("Поиск предмета");
-        if(text.isBlank()){
+        if (text.isBlank()) {
             return List.of();
-        }else {
+        } else {
             return itemService.search(text);
         }
     }
