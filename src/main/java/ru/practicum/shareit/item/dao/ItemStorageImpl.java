@@ -28,7 +28,12 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public Item itemUpdate(Item item, int itemId, int userId) {
+        if (!itemsMap.containsKey(itemId)) {
+            throw new ValidationException("Такого предмета не существует");
+        }
+
         Item i = itemsMap.get(itemId);
+
         if (i.getOwner().getId() == userId) {
 
             if (item.getAvailable() != null) {

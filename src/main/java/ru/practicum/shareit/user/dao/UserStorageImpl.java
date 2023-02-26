@@ -28,6 +28,10 @@ public class UserStorageImpl implements UserStorage {
 
     @Override
     public User update(User user, int userId) {
+        if (!userMap.containsKey(userId)) {
+            throw new ValidationException("Такого пользователя не существует");
+        }
+
         User u = userMap.get(userId);
         user.setId(userId);
 

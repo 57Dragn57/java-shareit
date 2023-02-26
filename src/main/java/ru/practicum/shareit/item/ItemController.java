@@ -54,8 +54,7 @@ public class ItemController {
         log.info("Поиск предмета");
         if (text.isBlank()) {
             return List.of();
-        } else {
-            return itemService.search(text);
         }
+        return itemService.search(text);
     }
 }
