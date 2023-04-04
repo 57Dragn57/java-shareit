@@ -1,21 +1,24 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.persistence.*;
 import java.util.Objects;
 
-@Data
-@Builder
+@Getter
+@Setter
+@Entity
+@Table(name = "items")
 public class Item {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     private String name;
     private String description;
     private Boolean available;
-    private User owner;
-    private ItemRequest request;
+    private long owner;
+    private long request;
 
     @Override
     public boolean equals(Object obj) {
@@ -36,4 +39,5 @@ public class Item {
 
         return hash;
     }
+
 }

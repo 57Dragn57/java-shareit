@@ -18,19 +18,20 @@ public class UserService {
         return UserMapper.toUserDto(userStorage.create(UserMapper.toUser(userDto)));
     }
 
-    public UserDto update(UserDto userDto, int userId) {
+    public UserDto update(UserDto userDto, long userId) {
         return UserMapper.toUserDto(userStorage.update(UserMapper.toUser(userDto), userId));
     }
 
-    public void delete(int id) {
+    public void delete(long id) {
         userStorage.delete(id);
     }
 
-    public UserDto getUser(int id) {
+    public UserDto getUser(long id) {
         return UserMapper.toUserDto(userStorage.getUser(id));
     }
 
     public List<UserDto> getAllUsers() {
         return userStorage.getAllUsers().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
+
 }

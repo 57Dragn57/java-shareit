@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Map;
+
 @RestControllerAdvice
 @Slf4j
 public class ExceptionController {
@@ -35,4 +37,10 @@ public class ExceptionController {
         log.info(e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ValidException.class)
+    public Map<String, String> validException(ValidException e) {
+        log.info(e.getMessage());
+        return Map.of("error", e.getMessage());
+    }
 }
