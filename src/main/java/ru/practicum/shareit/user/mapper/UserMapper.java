@@ -7,12 +7,11 @@ import ru.practicum.shareit.user.dto.UserDto;
 @UtilityClass
 public class UserMapper {
     public static UserDto toUserDto(User user) {
-        UserDto userDto = UserDto.builder()
+        return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
-        return userDto;
     }
 
     public static User toUser(UserDto userDto) {
@@ -23,4 +22,5 @@ public class UserMapper {
 
         return user;
     }
+
 }

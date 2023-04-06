@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -17,7 +18,9 @@ public class Item {
     private String name;
     private String description;
     private Boolean available;
-    private long owner;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "owner", nullable = false)
+    private User owner;
     private long request;
 
     @Override
@@ -39,5 +42,4 @@ public class Item {
 
         return hash;
     }
-
 }

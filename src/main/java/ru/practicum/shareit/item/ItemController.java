@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.comment.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.comment.CommentDtoRequest;
+import ru.practicum.shareit.item.comment.CommentDtoResponse;
+import ru.practicum.shareit.item.dto.ItemDtoRequest;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validated.Create;
 import ru.practicum.shareit.validated.Update;
@@ -27,38 +29,38 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") long userId, @Validated(Create.class) @RequestBody ItemDto itemDto) {
+    public ItemDtoResponse addItem(@RequestHeader("X-Sharer-User-Id") long userId, @Validated(Create.class) @RequestBody ItemDtoRequest itemDtoRequest) {
         log.info("Добавление нового предмета");
-        return itemService.addItem(itemDto, userId);
+        return itemService.addItem(itemDtoRequest, userId);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") long authorId, @PathVariable long itemId, @Valid @RequestBody CommentDto commentDto) {
+    public CommentDtoResponse createComment(@RequestHeader("X-Sharer-User-Id") long authorId, @PathVariable long itemId, @Valid @RequestBody CommentDtoRequest commentDtoRequest) {
         log.info("Добавление нового комментария");
-        return itemService.createComment(commentDto, authorId, itemId);
+        return itemService.createComment(commentDtoRequest, authorId, itemId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto itemUpdate(@RequestHeader("X-Sharer-User-Id") long userId, @Validated(Update.class)
-    @RequestBody ItemDto itemDto, @PathVariable long itemId) {
+    public ItemDtoResponse itemUpdate(@RequestHeader("X-Sharer-User-Id") long userId, @Validated(Update.class)
+    @RequestBody ItemDtoRequest itemDtoRequest, @PathVariable long itemId) {
         log.info("Обновление предмета");
-        return itemService.itemUpdate(itemDto, itemId, userId);
+        return itemService.itemUpdate(itemDtoRequest, itemId, userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDtoResponse getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Процесс получения предмета");
         return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoResponse> getItemsByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Пользователь просматривает свои предметы");
         return itemService.getItemsByUser(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
+    public List<ItemDtoResponse> search(@RequestParam String text) {
         log.info("Поиск предмета");
         if (text.isBlank()) {
             return List.of();
