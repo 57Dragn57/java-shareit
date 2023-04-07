@@ -12,12 +12,12 @@ import javax.validation.constraints.Size;
 @Data
 @Builder
 public class ItemDtoRequest {
-    long id;
+    private long id;
     @NotBlank(groups = {Create.class})
-    String name;
+    private String name;
     @NotBlank(groups = {Create.class})
     @Size(max = 200, groups = {Create.class, Update.class})
-    String description;
+    private String description;
     @NotNull(groups = {Create.class})
-    Boolean available;
+    private Boolean available;
 }

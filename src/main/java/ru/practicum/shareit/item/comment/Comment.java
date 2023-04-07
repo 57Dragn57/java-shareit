@@ -15,13 +15,13 @@ import java.time.LocalDateTime;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
-    String text;
+    private long id;
+    private String text;
     @ManyToOne
     @JoinColumn(name = "item_id")
-    Item item;
+    private Item item;
     @ManyToOne
     @JoinColumn(name = "author_id")
-    User author;
-    LocalDateTime created;
+    private User author;
+    private LocalDateTime created;
 }

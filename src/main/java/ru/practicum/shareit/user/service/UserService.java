@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -13,40 +14,44 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
 
+    @Transactional
     public UserDto create(UserDto userDto) {
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
+    @Transactional
     public UserDto update(UserDto userDto, long userId) {
-        if (!userRepository.existsById(userId)) {
+        try {
+            User u = userRepository.getReferenceById(userId);
+            userDto.setId(userId);
+
+            if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+                u.setEmail(userDto.getEmail());
+            }
+
+            if (userDto.getName() != null && !userDto.getName().isBlank()) {
+                u.setName(userDto.getName());
+            }
+
+            return UserMapper.toUserDto(u);
+        } catch (Exception e) {
             throw new ValidationException("Такого пользователя не существует");
         }
-
-        User u = userRepository.getReferenceById(userId);
-        userDto.setId(userId);
-
-        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            u.setEmail(userDto.getEmail());
-        }
-
-        if (userDto.getName() != null && !userDto.getName().isBlank()) {
-            u.setName(userDto.getName());
-        }
-
-        return UserMapper.toUserDto(userRepository.save(u));
     }
 
+    @Transactional
     public void delete(long id) {
         userRepository.deleteById(id);
     }
 
     public UserDto getUser(long id) {
-        if (userRepository.existsById(id)) {
+        try {
             return UserMapper.toUserDto(userRepository.getReferenceById(id));
-        } else {
+        } catch (Exception e) {
             throw new ValidationException("Пользователя не существует");
         }
     }

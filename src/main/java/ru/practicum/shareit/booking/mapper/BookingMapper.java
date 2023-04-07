@@ -34,7 +34,6 @@ public class BookingMapper {
         b.setId(bookingDtoRequest.getId());
         b.setStart(bookingDtoRequest.getStart());
         b.setEnd(bookingDtoRequest.getEnd());
-        b.setStatus(bookingDtoRequest.getStatus());
 
         return b;
     }

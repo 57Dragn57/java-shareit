@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -18,15 +19,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserService userService;
 
+    @Transactional
     public BookingDtoResponse addBooking(BookingDtoRequest bookingDtoRequest, long bookerId) {
-        if (userService.validation(bookerId) && itemRepository.existsById(bookingDtoRequest.getItemId())) {
+        try {
+
             if (bookingDtoRequest.getItemId() == 0 || bookerId == 0) {
-                throw new ValidationException("Переданы не все значения");
+                throw new ValidationException("");
             }
 
             Booking booking = BookingMapper.toBooking(bookingDtoRequest);
@@ -34,19 +38,27 @@ public class BookingService {
             booking.setItem(itemRepository.getReferenceById(bookingDtoRequest.getItemId()));
             booking.setStatus(BookingStatus.WAITING);
 
-            if (booking.getItem().getOwner().getId() == bookerId) {
-                throw new ValidationException("Вы не можете забронировать свой предмет");
+            try {
+                if (booking.getItem().getOwner().getId() == bookerId) {
+                    throw new ValidationException("");
+                }
+            } catch (Exception e) {
+                throw new ValidationException("Предмет не существует");
             }
 
             if (booking.getItem().getAvailable() && booking.getStart().isBefore(booking.getEnd())) {
                 return BookingMapper.toBookingDto(bookingRepository.save(booking));
             }
-            throw new ValidException("Нет доступа для бронирования этого предмета");
-        } else {
-            throw new ValidationException("Пользователь не найден");
+            throw new ValidException("");
+        } catch (ValidationException | ValidException e) {
+            if (e instanceof ValidException) {
+                throw new ValidException("Нет доступа");
+            }
+            throw new ValidationException("Ошибка данных");
         }
     }
 
+    @Transactional
     public BookingDtoResponse changeStatus(long bookingId, boolean approved, long userId) {
         Booking b = findBooking(bookingId, userId);
         if (b.getItem().getOwner().getId() == userId) {
@@ -134,11 +146,17 @@ public class BookingService {
         return bookingRepository.findLastBooking(itemId);
     }
 
+    public List<Booking> findLastBookings(List<Item> items) {
+        return bookingRepository.findByItemInAndStartBeforeAndStatusOrderByStartDesc(items, LocalDateTime.now(), BookingStatus.APPROVED);
+    }
 
     public Booking findNextBooking(long itemId) {
         return bookingRepository.findNextBooking(itemId);
     }
 
+    public List<Booking> findNextBookings(List<Item> items) {
+        return bookingRepository.findByItemInAndStartAfterAndStatusOrderByStart(items, LocalDateTime.now(), BookingStatus.APPROVED);
+    }
 
     public Booking findBookingByItemAndBooker(long bookerId, long itemId) {
         return bookingRepository.findBookingByBookerIdAndItemId(bookerId, itemId);

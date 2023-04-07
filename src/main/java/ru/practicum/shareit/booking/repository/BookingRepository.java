@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,10 +77,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "select b.id, b.start_date, b.end_date, b.item_id, b.booker_id, b.status " +
             "from bookings as b " +
-            "where b.ITEM_ID = ?1 and b.START_DATE < now() and b.STATUS = 'APPROVED' " +
+            "where b.ITEM_ID = ?1 and b.START_DATE <= now() and b.STATUS = 'APPROVED' " +
             "order by b.START_DATE DESC " +
             "limit 1", nativeQuery = true)
     Booking findLastBooking(long itemId);
+
+    List<Booking> findByItemInAndStartBeforeAndStatusOrderByStartDesc(List<Item> items, LocalDateTime dateTime, BookingStatus status);
 
     @Query(value = "select b.id, b.start_date, b.end_date, b.item_id, b.booker_id, b.status " +
             "from bookings as b " +
@@ -87,6 +90,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by b.START_DATE " +
             "limit 1", nativeQuery = true)
     Booking findNextBooking(long itemId);
+
+    List<Booking> findByItemInAndStartAfterAndStatusOrderByStart(List<Item> items, LocalDateTime dateTime, BookingStatus status);
 
     @Query(value = "select b.id, b.start_date, b.end_date, b.item_id, b.booker_id, b.status " +
             "from bookings as b " +

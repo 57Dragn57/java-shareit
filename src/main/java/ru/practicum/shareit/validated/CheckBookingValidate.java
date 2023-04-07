@@ -16,6 +16,10 @@ public class CheckBookingValidate implements ConstraintValidator<BookingValid, B
     public boolean isValid(BookingDtoRequest booking, ConstraintValidatorContext constraintValidatorContext) {
         LocalDateTime start = booking.getStart();
         LocalDateTime end = booking.getEnd();
+        if (start == null || end == null) {
+            return false;
+        }
+
         if (start.isAfter(end) || start.equals(end)) {
             throw new ValidException("Дата уканана неверно");
         }
