@@ -27,35 +27,24 @@ public class BookingService {
 
     @Transactional
     public BookingDtoResponse addBooking(BookingDtoRequest bookingDtoRequest, long bookerId) {
-        try {
 
-            if (bookingDtoRequest.getItemId() == 0 || bookerId == 0) {
-                throw new ValidationException("");
-            }
-
-            Booking booking = BookingMapper.toBooking(bookingDtoRequest);
-            booking.setBooker(UserMapper.toUser(userService.getUser(bookerId)));
-            booking.setItem(itemRepository.getReferenceById(bookingDtoRequest.getItemId()));
-            booking.setStatus(BookingStatus.WAITING);
-
-            try {
-                if (booking.getItem().getOwner().getId() == bookerId) {
-                    throw new ValidationException("");
-                }
-            } catch (Exception e) {
-                throw new ValidationException("Предмет не существует");
-            }
-
-            if (booking.getItem().getAvailable() && booking.getStart().isBefore(booking.getEnd())) {
-                return BookingMapper.toBookingDto(bookingRepository.save(booking));
-            }
-            throw new ValidException("");
-        } catch (ValidationException | ValidException e) {
-            if (e instanceof ValidException) {
-                throw new ValidException("Нет доступа");
-            }
-            throw new ValidationException("Ошибка данных");
+        if (bookingDtoRequest.getItemId() == 0 || bookerId == 0) {
+            throw new ValidationException("");
         }
+
+        Booking booking = BookingMapper.toBooking(bookingDtoRequest);
+        booking.setBooker(UserMapper.toUser(userService.getUser(bookerId)));
+        booking.setItem(itemRepository.findById(bookingDtoRequest.getItemId()).orElseThrow(() -> new ValidationException("Предмет не существует")));
+        booking.setStatus(BookingStatus.WAITING);
+
+        if (booking.getItem().getOwner().getId() == bookerId) {
+            throw new ValidationException("Владелец не может бронировать свой предмет");
+        }
+
+        if (booking.getItem().getAvailable() && booking.getStart().isBefore(booking.getEnd())) {
+            return BookingMapper.toBookingDto(bookingRepository.save(booking));
+        }
+        throw new ValidException("Ошибка валидации доступа");
     }
 
     @Transactional

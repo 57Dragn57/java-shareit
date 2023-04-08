@@ -25,22 +25,18 @@ public class UserService {
 
     @Transactional
     public UserDto update(UserDto userDto, long userId) {
-        try {
-            User u = userRepository.getReferenceById(userId);
-            userDto.setId(userId);
+        User u = userRepository.findById(userId).orElseThrow(() -> new ValidationException("Пользователя не существует"));
+        userDto.setId(userId);
 
-            if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-                u.setEmail(userDto.getEmail());
-            }
-
-            if (userDto.getName() != null && !userDto.getName().isBlank()) {
-                u.setName(userDto.getName());
-            }
-
-            return UserMapper.toUserDto(u);
-        } catch (Exception e) {
-            throw new ValidationException("Такого пользователя не существует");
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            u.setEmail(userDto.getEmail());
         }
+
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            u.setName(userDto.getName());
+        }
+
+        return UserMapper.toUserDto(u);
     }
 
     @Transactional
@@ -49,11 +45,7 @@ public class UserService {
     }
 
     public UserDto getUser(long id) {
-        try {
-            return UserMapper.toUserDto(userRepository.getReferenceById(id));
-        } catch (Exception e) {
-            throw new ValidationException("Пользователя не существует");
-        }
+        return UserMapper.toUserDto(userRepository.findById(id).orElseThrow(() -> new ValidationException("Пользователя не существует")));
     }
 
     public List<UserDto> getAllUsers() {

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.*;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
@@ -68,48 +68,39 @@ public class ItemService {
     public ItemDtoResponse itemUpdate(ItemDtoRequest itemDtoRequest, long itemId, long userId) {
         if (userService.validation(userId)) {
 
-            try {
-                Item i = itemRepository.getReferenceById(itemId);
-                i.setId(itemId);
+            Item i = itemRepository.findById(itemId).orElseThrow(() -> new ValidationException("Предмета не существует"));
+            i.setId(itemId);
 
-                if (i.getOwner().getId() == userId) {
+            if (i.getOwner().getId() == userId) {
 
-                    if (itemDtoRequest.getAvailable() != null) {
-                        i.setAvailable(itemDtoRequest.getAvailable());
-                    }
-
-                    if (itemDtoRequest.getDescription() != null && !itemDtoRequest.getDescription().isBlank()) {
-                        i.setDescription(itemDtoRequest.getDescription());
-                    }
-
-                    if (itemDtoRequest.getName() != null && !itemDtoRequest.getName().isBlank()) {
-                        i.setName(itemDtoRequest.getName());
-                    }
+                if (itemDtoRequest.getAvailable() != null) {
+                    i.setAvailable(itemDtoRequest.getAvailable());
                 }
-                return ItemMapper.toItemDto(i);
-            } catch (Exception e) {
-                throw new ValidationException("Такого предмета не существует");
+
+                if (itemDtoRequest.getDescription() != null && !itemDtoRequest.getDescription().isBlank()) {
+                    i.setDescription(itemDtoRequest.getDescription());
+                }
+
+                if (itemDtoRequest.getName() != null && !itemDtoRequest.getName().isBlank()) {
+                    i.setName(itemDtoRequest.getName());
+                }
             }
+            return ItemMapper.toItemDto(i);
         }
         throw new ValidationException("Пользователя не существует");
     }
 
     public ItemDtoResponse getItemById(long id, long userId) {
-        Item item;
-        if (itemRepository.existsById(id)) {
-            item = itemRepository.getReferenceById(id);
+        Item item = itemRepository.findById(id).orElseThrow(() -> new ValidationException("Такого предмета не существует"));
 
-            ItemDtoResponse idto = ItemMapper.toItemDto(item);
-            idto.setComments(CommentMapper.commentDtoList(commentRepository.findCommentsByItemId(id)));
+        ItemDtoResponse idto = ItemMapper.toItemDto(item);
+        idto.setComments(CommentMapper.commentDtoList(commentRepository.findCommentsByItemId(id)));
 
-            if (item.getOwner().getId() == userId) {
-                idto.setLastBooking(BookingMapper.toBookingDto(bookingService.findLastBooking(id)));
-                idto.setNextBooking(BookingMapper.toBookingDto(bookingService.findNextBooking(id)));
-            }
-            return idto;
-        } else {
-            throw new ValidationException("Такого предмета не существует");
+        if (item.getOwner().getId() == userId) {
+            idto.setLastBooking(BookingMapper.toBookingDto(bookingService.findLastBooking(id)));
+            idto.setNextBooking(BookingMapper.toBookingDto(bookingService.findNextBooking(id)));
         }
+        return idto;
     }
 
     public List<ItemDtoResponse> getItemsByUser(long id) {
@@ -120,47 +111,29 @@ public class ItemService {
                 .stream()
                 .collect(groupingBy(Comment::getItem, toList()));
 
-        Map<Item, List<Booking>> lastBooking = bookingService.findLastBookings(items)
+        Map<Item, Booking> lastBooking = bookingService.findLastBookings(items)
                 .stream()
-                .collect(groupingBy(Booking::getItem, toList()));
+                .collect(toMap(Booking::getItem, identity(), (o, n) -> o));
 
-        Map<Item, List<Booking>> nextBooking = bookingService.findNextBookings(items)
+        Map<Item, Booking> nextBooking = bookingService.findNextBookings(items)
                 .stream()
-                .collect(groupingBy(Booking::getItem, toList()));
+                .collect(toMap(Booking::getItem, identity(), (o, n) -> o));
 
-        for (Item i : items) {
-            ItemDtoResponse idr = ItemMapper.toItemDto(i);
+        for (Item item : items) {
+            ItemDtoResponse itemDtoResponse = ItemMapper.toItemDto(item);
 
-            if (comments.containsKey(i)) {
-                idr.setComments(CommentMapper.commentDtoList(comments.get(i)));
+            if (comments.containsKey(item)) {
+                itemDtoResponse.setComments(CommentMapper.commentDtoList(comments.get(item)));
             }
 
-            if (lastBooking.containsKey(i)) {
-                if (lastBooking.size() > 1) {
-                    Booking last = lastBooking.get(i).get(0);
-                    for (Booking b : lastBooking.get(i)) {
-                        if (b.getStart().isAfter(last.getStart())) {
-                            last = b;
-                        }
-                    }
-                } else {
-                    idr.setLastBooking(BookingMapper.toBookingDto(lastBooking.get(i).get(0)));
-                }
+            if (lastBooking.containsKey(item)) {
+                itemDtoResponse.setLastBooking(BookingMapper.toBookingDto(lastBooking.get(item)));
             }
 
-            if (nextBooking.containsKey(i)) {
-                if (lastBooking.size() > 1) {
-                    Booking next = nextBooking.get(i).get(0);
-                    for (Booking b : nextBooking.get(i)) {
-                        if (b.getStart().isBefore(next.getStart())) {
-                            next = b;
-                        }
-                    }
-                } else {
-                    idr.setNextBooking(BookingMapper.toBookingDto(nextBooking.get(i).get(0)));
-                }
+            if (nextBooking.containsKey(item)) {
+                itemDtoResponse.setNextBooking(BookingMapper.toBookingDto(nextBooking.get(item)));
             }
-            itemsDto.add(idr);
+            itemsDto.add(itemDtoResponse);
         }
 
         return itemsDto;
