@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,8 +104,12 @@ public class ItemService {
         return idto;
     }
 
-    public List<ItemDtoResponse> getItemsByUser(long id) {
-        List<Item> items = itemRepository.findByOwnerId(id);
+    public List<ItemDtoResponse> getItemsByUser(long id, int from, int size) {
+        if (from < 0 || size < 0) {
+            throw new ValidException("Отрицательное число from или size");
+        }
+
+        List<Item> items = itemRepository.findByOwnerId(id, PageRequest.of(from / size, size)).toList();
         List<ItemDtoResponse> itemsDto = new ArrayList<>();
 
         Map<Item, List<Comment>> comments = commentRepository.findByItemIn(items, Sort.by(DESC, "created"))
@@ -139,8 +144,16 @@ public class ItemService {
         return itemsDto;
     }
 
-    public List<ItemDtoResponse> search(String text) {
+    public List<ItemDtoResponse> search(String text, int from, int size) {
+        if (from < 0 || size < 0) {
+            throw new ValidException("Отрицательное число from или size");
+        }
+
         return ItemMapper.itemDtoList(
-                itemRepository.findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text));
+                itemRepository.findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text, PageRequest.of(from / size, size)).toList());
+    }
+
+    public List<ItemDtoResponse> findItemByRequest(long requestId){
+        return ItemMapper.itemDtoList(itemRepository.findItemsByRequests(requestId));
     }
 }

@@ -17,4 +17,5 @@ public class ItemDtoResponse {
     private BookingDtoResponse lastBooking;
     private BookingDtoResponse nextBooking;
     private List<CommentDtoResponse> comments;
+    private long requestId;
 }

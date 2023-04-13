@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
@@ -70,7 +71,11 @@ public class BookingService {
         return BookingMapper.toBookingDto(findBooking(bookingId, userId));
     }
 
-    public List<BookingDtoResponse> findBookingsListByBooker(String state, long bookerId) {
+    public List<BookingDtoResponse> findBookingsListByBooker(String state, long bookerId, int from, int size) {
+        if (from < 0 || size < 0) {
+            throw new ValidException("Отрицательное число from или size");
+        }
+
         if (userService.validation(bookerId)) {
             LocalDateTime now = LocalDateTime.now();
 
@@ -79,17 +84,23 @@ public class BookingService {
 
                 switch (s) {
                     case ALL:
-                        return BookingMapper.bookingDtoList(bookingRepository.findBookingsByBookerIdOrderByStartDesc(bookerId));
+                        return BookingMapper.bookingDtoList(bookingRepository.findBookingsByBookerIdOrderByStartDesc(bookerId,
+                                PageRequest.of(from / size, size)).toList());
                     case CURRENT:
-                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByBooker(bookerId, now, "APPROVED"));
+                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByBooker(bookerId, now, "APPROVED",
+                                PageRequest.of(from / size, size)).toList());
                     case PAST:
-                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByBooker(bookerId, now, "APPROVED"));
+                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByBooker(bookerId, now, "APPROVED",
+                                PageRequest.of(from / size, size)).toList());
                     case FUTURE:
-                        return BookingMapper.bookingDtoList(bookingRepository.findFutureBookingsByBooker(bookerId, now));
+                        return BookingMapper.bookingDtoList(bookingRepository.findFutureBookingsByBooker(bookerId, now,
+                                PageRequest.of(from / size, size)).toList());
                     case WAITING:
-                        return BookingMapper.bookingDtoList(bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(bookerId, BookingStatus.WAITING));
+                        return BookingMapper.bookingDtoList(bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(bookerId,
+                                BookingStatus.WAITING, PageRequest.of(from / size, size)).toList());
                     case REJECTED:
-                        return BookingMapper.bookingDtoList(bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(bookerId, BookingStatus.REJECTED));
+                        return BookingMapper.bookingDtoList(bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(bookerId,
+                                BookingStatus.REJECTED, PageRequest.of(from / size, size)).toList());
                     default:
                         break;
                 }
@@ -101,7 +112,11 @@ public class BookingService {
     }
 
 
-    public List<BookingDtoResponse> findBookingsListByOwner(String state, long ownerId) {
+    public List<BookingDtoResponse> findBookingsListByOwner(String state, long ownerId, int from, int size) {
+        if (from < 0 || size < 0) {
+            throw new ValidException("Отрицательное число from или size");
+        }
+
         if (userService.validation(ownerId)) {
             LocalDateTime now = LocalDateTime.now();
 
@@ -110,17 +125,23 @@ public class BookingService {
 
                 switch (s) {
                     case ALL:
-                        return BookingMapper.bookingDtoList(bookingRepository.findAllBookingsByOwners(ownerId));
+                        return BookingMapper.bookingDtoList(bookingRepository.findAllBookingsByOwners(ownerId,
+                                PageRequest.of(from / size, size)).toList());
                     case CURRENT:
-                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByOwner(ownerId, now, "APPROVED"));
+                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByOwner(ownerId, now, "APPROVED",
+                                PageRequest.of(from / size, size)).toList());
                     case PAST:
-                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByOwner(ownerId, now, "APPROVED"));
+                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByOwner(ownerId, now, "APPROVED",
+                                PageRequest.of(from / size, size)).toList());
                     case FUTURE:
-                        return BookingMapper.bookingDtoList(bookingRepository.findFutureBookingsByOwner(ownerId, now));
+                        return BookingMapper.bookingDtoList(bookingRepository.findFutureBookingsByOwner(ownerId, now,
+                                PageRequest.of(from / size, size)).toList());
                     case WAITING:
-                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, "WAITING"));
+                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, "WAITING",
+                                PageRequest.of(from / size, size)).toList());
                     case REJECTED:
-                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, "REJECTED"));
+                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, "REJECTED",
+                                PageRequest.of(from / size, size)).toList());
                     default:
                         throw new ValidException("Unknown state: " + state);
                 }
@@ -153,12 +174,10 @@ public class BookingService {
 
     private Booking findBooking(long bookingId, long userId) {
         if (userService.validation(userId)) {
-            if (bookingRepository.existsById(bookingId)) {
-                Booking b = bookingRepository.getReferenceById(bookingId);
-                Item item = b.getItem();
-                if (userId == b.getBooker().getId() || userId == item.getOwner().getId()) {
-                    return b;
-                }
+            Booking b = bookingRepository.findById(bookingId).orElseThrow(() -> new ValidationException("Вы не являетесь владельцем вещи или создателем бронирования"));
+            Item item = b.getItem();
+            if (userId == b.getBooker().getId() || userId == item.getOwner().getId()) {
+                return b;
             }
             throw new ValidationException("Вы не являетесь владельцем вещи или создателем бронирования");
         } else {
