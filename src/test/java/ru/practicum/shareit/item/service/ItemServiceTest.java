@@ -31,27 +31,27 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
     private final ItemDtoRequest itemDto = ItemDtoRequest.builder()
-            .name("Тример электрический")
-            .description("Для скоса травы")
+            .name("РўСЂРёРјРµСЂ СЌР»РµРєС‚СЂРёС‡РµСЃРєРёР№")
+            .description("Р”Р»СЏ СЃРєРѕСЃР° С‚СЂР°РІС‹")
             .available(true)
             .build();
 
     private final Item item = Item.builder()
-            .name("Лопата")
-            .description("Многофункциональная лопата")
+            .name("Р›РѕРїР°С‚Р°")
+            .description("РњРЅРѕРіРѕС„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅР°СЏ Р»РѕРїР°С‚Р°")
             .owner(new User())
             .available(true)
             .build();
 
     private final CommentDtoRequest commentDto = CommentDtoRequest.builder()
-            .text("Отличный аппарат")
+            .text("РћС‚Р»РёС‡РЅС‹Р№ Р°РїРїР°СЂР°С‚")
             .build();
 
     private final Comment comment = Comment.builder()
             .created(LocalDateTime.now().minusHours(1))
             .item(item)
             .author(new User())
-            .text("Просто огонь")
+            .text("РџСЂРѕСЃС‚Рѕ РѕРіРѕРЅСЊ")
             .build();
 
     @Mock

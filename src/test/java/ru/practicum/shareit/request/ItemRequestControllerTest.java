@@ -9,7 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.request.dto.RequestOnItemRequestDto;
 
-import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,7 +27,7 @@ class ItemRequestControllerTest {
     @Test
     void createRequest_whenRequestIsCorrect_thenStatusIsOk() throws Exception {
         RequestOnItemRequestDto requestDto = new RequestOnItemRequestDto(
-                "Хотел бы воспользоваться щёткой для обуви"
+                "РҐРѕС‚РµР» Р±С‹ РІРѕСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ С‰С‘С‚РєРѕР№ РґР»СЏ РѕР±СѓРІРё"
         );
         long requestorId = 1L;
 

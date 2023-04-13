@@ -45,9 +45,9 @@ class BookingServiceTest {
 
     private final Item item = Item.builder()
             .id(1L)
-            .name("Дрель")
+            .name("Р”СЂРµР»СЊ")
             .available(true)
-            .description("Дрель обыкновенная")
+            .description("Р”СЂРµР»СЊ РѕР±С‹РєРЅРѕРІРµРЅРЅР°СЏ")
             .owner(owner)
             .build();
 

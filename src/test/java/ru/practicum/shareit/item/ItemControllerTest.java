@@ -28,8 +28,8 @@ class ItemControllerTest {
     void addItem_whenItemIsCorrect_thenStatusIsOk() throws Exception {
         ItemDtoRequest itemDto = new ItemDtoRequest(
                 0,
-                "Дрель",
-                "Дрель обыкновенная",
+                "Р”СЂРµР»СЊ",
+                "Р”СЂРµР»СЊ РѕР±С‹РєРЅРѕРІРµРЅРЅР°СЏ",
                 true,
                 0
         );
@@ -50,7 +50,7 @@ class ItemControllerTest {
         ItemDtoRequest itemDto = new ItemDtoRequest(
                 0,
                 " ",
-                "Дрель обыкновенная",
+                "Р”СЂРµР»СЊ РѕР±С‹РєРЅРѕРІРµРЅРЅР°СЏ",
                 true,
                 0
         );
@@ -70,7 +70,7 @@ class ItemControllerTest {
     void createComment_whenCommentIsCorrect_thenStatusIsOk() throws Exception {
         CommentDtoRequest commentDto = new CommentDtoRequest(
                 0,
-                "Отличный аппарат"
+                "РћС‚Р»РёС‡РЅС‹Р№ Р°РїРїР°СЂР°С‚"
         );
         long itemId = 1L;
         long authorId = 1L;
@@ -109,7 +109,7 @@ class ItemControllerTest {
         ItemDtoRequest itemDto = new ItemDtoRequest(
                 0,
                 null,
-                "Дрель необыкновенная",
+                "Р”СЂРµР»СЊ РЅРµРѕР±С‹РєРЅРѕРІРµРЅРЅР°СЏ",
                 null,
                 0
         );
@@ -131,10 +131,10 @@ class ItemControllerTest {
         ItemDtoRequest itemDto = new ItemDtoRequest(
                 0,
                 null,
-                "Когда берешь в руки инструмент, еще даже не работая, становится понятно, что от него ждать, " +
-                        "если внешне сделан аккуратно, удобно и приятно держать в руках, " +
-                        "нет шума и посторонних звуков в корпусе, то и в работе проявит себя хорошо. " +
-                        "Так и вышло, по работе меня устраивает модель - отлично ставлю по всем параметрам, не подводила дрель.",
+                "РљРѕРіРґР° Р±РµСЂРµС€СЊ РІ СЂСѓРєРё РёРЅСЃС‚СЂСѓРјРµРЅС‚, РµС‰Рµ РґР°Р¶Рµ РЅРµ СЂР°Р±РѕС‚Р°СЏ, СЃС‚Р°РЅРѕРІРёС‚СЃСЏ РїРѕРЅСЏС‚РЅРѕ, С‡С‚Рѕ РѕС‚ РЅРµРіРѕ Р¶РґР°С‚СЊ, " +
+                        "РµСЃР»Рё РІРЅРµС€РЅРµ СЃРґРµР»Р°РЅ Р°РєРєСѓСЂР°С‚РЅРѕ, СѓРґРѕР±РЅРѕ Рё РїСЂРёСЏС‚РЅРѕ РґРµСЂР¶Р°С‚СЊ РІ СЂСѓРєР°С…, " +
+                        "РЅРµС‚ С€СѓРјР° Рё РїРѕСЃС‚РѕСЂРѕРЅРЅРёС… Р·РІСѓРєРѕРІ РІ РєРѕСЂРїСѓСЃРµ, С‚Рѕ Рё РІ СЂР°Р±РѕС‚Рµ РїСЂРѕСЏРІРёС‚ СЃРµР±СЏ С…РѕСЂРѕС€Рѕ. " +
+                        "РўР°Рє Рё РІС‹С€Р»Рѕ, РїРѕ СЂР°Р±РѕС‚Рµ РјРµРЅСЏ СѓСЃС‚СЂР°РёРІР°РµС‚ РјРѕРґРµР»СЊ - РѕС‚Р»РёС‡РЅРѕ СЃС‚Р°РІР»СЋ РїРѕ РІСЃРµРј РїР°СЂР°РјРµС‚СЂР°Рј, РЅРµ РїРѕРґРІРѕРґРёР»Р° РґСЂРµР»СЊ.",
                 null,
                 0
         );
@@ -182,7 +182,7 @@ class ItemControllerTest {
 
     @Test
     void search_thenStatusIsOk() throws Exception {
-        String text = "отвертка";
+        String text = "РѕС‚РІРµСЂС‚РєР°";
         int from = 0;
         int size = 5;
 
