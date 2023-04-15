@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
@@ -62,14 +63,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findPastBookingsByOwner(long ownerId, LocalDateTime date, String status, Pageable pageable);
 
     @Query(value = "select b.id, b.start_date, b.end_date, b.item_id, b.booker_id, b.status " +
-            "from bookings as b join ITEMS I on b.ITEM_ID = I.ID " +
+            "from bookings b join ITEMS I on b.ITEM_ID = I.ID " +
             "join USERS U on I.OWNER = U.ID " +
-            "where U.ID = ?1 " +
+            "where U.ID = (:ownerId) " +
             "group by b.START_DATE, b.ID " +
             "order by b.START_DATE DESC ",
-            countQuery = "SELECT count(*) FROM BOOKINGS"
+            countQuery = "SELECT count(*) FROM BOOKINGS "
             , nativeQuery = true)
-    Page<Booking> findAllBookingsByOwners(long ownerId, Pageable pageable);
+    Page<Booking> findAllBookingsByOwners(@Param("ownerId") long ownerId, Pageable pageable);
 
     @Query(value = "select b.id, b.start_date, b.end_date, b.item_id, b.booker_id, b.status " +
             "from bookings as b join ITEMS I on b.ITEM_ID = I.ID " +
