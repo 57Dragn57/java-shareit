@@ -22,7 +22,7 @@ create table if not exists items
     available   boolean,
     owner       long references users,
     requests    long default 0
-);//программа не запускается при присвоении полю Requests таблицу Users
+);
 
 create table if not exists bookings
 (
