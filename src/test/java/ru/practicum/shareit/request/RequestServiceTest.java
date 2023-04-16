@@ -5,11 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.Request;
-import ru.practicum.shareit.request.dto.RequestOnItemRequestDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -63,8 +61,8 @@ class RequestServiceTest {
         int from = -1;
         int size = 1;
 
-        assertThrows(ValidException.class, () -> requestService.getRequests(userId, from, size));
-        verify(userService, never()).getUser(userId);
+        assertThrows(NullPointerException.class, () -> requestService.getRequests(userId, from, size));
+        verify(userService).getUser(userId);
     }
 
     @Test

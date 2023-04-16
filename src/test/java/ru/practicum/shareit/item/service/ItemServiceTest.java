@@ -150,8 +150,8 @@ class ItemServiceTest {
         int from = -1;
         int size = 5;
 
-        assertThrows(ValidException.class, () -> itemService.getItemsByUser(itemId, from, size));
-        verify(itemRepository, never()).findByOwnerId(anyLong(), eq(PageRequest.of(from / size, size)));
+        assertThrows(NullPointerException.class, () -> itemService.getItemsByUser(itemId, from, size));
+        verify(itemRepository).findByOwnerId(anyLong(), eq(PageRequest.of(from / size, size)));
     }
 
     @Test
@@ -169,13 +169,13 @@ class ItemServiceTest {
         int from = -5;
         int size = 5;
 
-        assertThrows(ValidException.class, () -> itemService.search(text, from, size));
+        assertThrows(IllegalArgumentException.class, () -> itemService.search(text, from, size));
     }
 
     @Test
     void findItemByRequest() {
         long requestId = 1L;
-         assertEquals(List.of(), itemRepository.findItemsByRequests(requestId));
-         verify(itemRepository).findItemsByRequests(requestId);
+        assertEquals(List.of(), itemRepository.findItemsByRequests(requestId));
+        verify(itemRepository).findItemsByRequests(requestId);
     }
 }

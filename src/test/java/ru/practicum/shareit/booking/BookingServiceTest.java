@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -123,7 +122,7 @@ class BookingServiceTest {
         long bookerId = 1L;
         int from = -1;
         int size = 5;
-        assertThrows(ValidException.class, () -> bookingService.findBookingsListByBooker(state, bookerId, from, size));
+        assertThrows(ValidationException.class, () -> bookingService.findBookingsListByBooker(state, bookerId, from, size));
     }
 
     @Test
@@ -132,7 +131,7 @@ class BookingServiceTest {
         long bookerId = 1L;
         int from = -1;
         int size = 5;
-        assertThrows(ValidException.class, () -> bookingService.findBookingsListByOwner(state, bookerId, from, size));
+        assertThrows(ValidationException.class, () -> bookingService.findBookingsListByOwner(state, bookerId, from, size));
     }
 
     @Test
