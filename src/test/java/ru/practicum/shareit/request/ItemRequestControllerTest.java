@@ -9,7 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.request.dto.RequestOnItemRequestDto;
 
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -84,6 +83,22 @@ class ItemRequestControllerTest {
                 .andDo(print());
 
         Mockito.verify(requestService).getRequests(userId, from, size);
+    }
+
+    @Test
+    void getRequestPage_thenStatusIsBadRequest() throws Exception {
+        long userId = 1L;
+        int from = -1;
+        int size = 5;
+
+        mockMvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("from", "-1")
+                        .param("size", "5"))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        Mockito.verify(requestService, Mockito.never()).getRequests(userId, from, size);
     }
 
     @Test

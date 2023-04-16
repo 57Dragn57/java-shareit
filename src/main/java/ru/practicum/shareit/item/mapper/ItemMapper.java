@@ -11,13 +11,18 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class ItemMapper {
     public static ItemDtoResponse toItemDto(Item item) {
-        return ItemDtoResponse.builder()
+        ItemDtoResponse itemDto = ItemDtoResponse.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .requestId(item.getRequests())
                 .build();
+
+        if (item.getRequests() != null) {
+            itemDto.setRequestId(item.getRequests().getId());
+        }
+
+        return itemDto;
     }
 
     public static Item toItem(ItemDtoRequest itemDtoRequest) {
@@ -26,7 +31,6 @@ public class ItemMapper {
         item.setName(itemDtoRequest.getName());
         item.setDescription(itemDtoRequest.getDescription());
         item.setAvailable(itemDtoRequest.getAvailable());
-        item.setRequests(itemDtoRequest.getRequestId());
 
         return item;
     }

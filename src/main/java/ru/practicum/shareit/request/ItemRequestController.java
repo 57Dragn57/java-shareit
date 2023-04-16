@@ -3,18 +3,21 @@ package ru.practicum.shareit.request;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.RequestOnItemRequestDto;
 import ru.practicum.shareit.request.dto.ResponseOnItemRequestDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ItemRequestController {
     private RequestService requestService;
 
@@ -36,7 +39,9 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<ResponseOnItemRequestDto> getRequestPage(@RequestHeader("X-Sharer-User-Id") long userId, @Positive @RequestParam(defaultValue = "0") int from, @Positive @RequestParam(defaultValue = "5") int size) {
+    public List<ResponseOnItemRequestDto> getRequestPage(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                         @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                                         @Positive @RequestParam(defaultValue = "5") int size) {
         log.info("Получение страницы с запросами");
         return requestService.getRequests(userId, from, size);
     }

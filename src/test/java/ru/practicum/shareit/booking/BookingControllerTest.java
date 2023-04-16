@@ -64,6 +64,7 @@ class BookingControllerTest {
         Mockito.verify(bookingService, Mockito.never()).addBooking(bookingDto, bookerId);
     }
 
+
     @Test
     void changeStatus_thenStatusIsOk() throws Exception {
         long bookingId = 1L;
@@ -111,6 +112,24 @@ class BookingControllerTest {
     }
 
     @Test
+    void findBookingsByBookerState_thenStatusBadRequest() throws Exception {
+        String state = "ALL";
+        long userId = 1L;
+        int from = -1;
+        int size = 5;
+
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("state", "ALL")
+                        .param("from", "-1")
+                        .param("size", "5"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(bookingService, Mockito.never()).findBookingsListByBooker(state, userId, from, size);
+    }
+
+    @Test
     void findBookingsByOwnerState_thenStatusIsOk() throws Exception {
         String state = "ALL";
         long userId = 1L;
@@ -126,5 +145,23 @@ class BookingControllerTest {
                 .andExpect(status().isOk());
 
         Mockito.verify(bookingService).findBookingsListByOwner(state, userId, from, size);
+    }
+
+    @Test
+    void findBookingsByOwnerState_thenStatusIsBadRequest() throws Exception {
+        String state = "ALL";
+        long userId = 1L;
+        int from = 0;
+        int size = -5;
+
+        mockMvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("state", "ALL")
+                        .param("from", "0")
+                        .param("size", "-5"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(bookingService, Mockito.never()).findBookingsListByOwner(state, userId, from, size);
     }
 }

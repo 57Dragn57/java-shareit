@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -42,5 +43,11 @@ public class ExceptionController {
     public Map<String, String> validException(ValidException e) {
         log.info(e.getMessage());
         return Map.of("error", e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public void methodPositiveOrZeroValid(ConstraintViolationException e) {
+        log.info(e.getMessage());
     }
 }

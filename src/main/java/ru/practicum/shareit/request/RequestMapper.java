@@ -23,7 +23,6 @@ public class RequestMapper {
         return ResponseOnItemRequestDto.builder()
                 .id(request.getId())
                 .description(request.getDescription())
-                .requestor(request.getRequestor())
                 .created(request.getCreated())
                 .build();
     }

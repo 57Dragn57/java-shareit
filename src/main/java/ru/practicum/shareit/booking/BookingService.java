@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
@@ -73,10 +72,6 @@ public class BookingService {
     }
 
     public List<BookingDtoResponse> findBookingsListByBooker(String state, long bookerId, int from, int size) {
-        if (from < 0 || size < 0) {
-            throw new ValidException("Отрицательное число from или size");
-        }
-
         if (userService.validation(bookerId)) {
             LocalDateTime now = LocalDateTime.now();
 
@@ -114,10 +109,6 @@ public class BookingService {
 
 
     public List<BookingDtoResponse> findBookingsListByOwner(String state, long ownerId, int from, int size) {
-        if (from < 0 || size < 0) {
-            throw new ValidException("Отрицательное число from или size");
-        }
-
         if (userService.validation(ownerId)) {
             LocalDateTime now = LocalDateTime.now();
 

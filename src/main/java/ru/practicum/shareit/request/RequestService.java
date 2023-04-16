@@ -5,8 +5,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.Request;
 import ru.practicum.shareit.request.dto.RequestOnItemRequestDto;
@@ -14,7 +15,9 @@ import ru.practicum.shareit.request.dto.ResponseOnItemRequestDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,36 +34,41 @@ public class RequestService {
     }
 
     public List<ResponseOnItemRequestDto> getRequests(long userId) {
-        List<ResponseOnItemRequestDto> requests = RequestMapper.toResponseOnRequestList(requestRepository.findByRequestor(UserMapper.toUser(userService.getUser(userId))));
+        List<Request> requests = requestRepository.findByRequestor(UserMapper.toUser(userService.getUser(userId)));
 
-        for (ResponseOnItemRequestDto r : requests) {
-            r.setItems(itemService.findItemByRequest(r.getId()));
-        }
-
-        return requests;
+        return addItemsInRequests(requests);
     }
 
     public List<ResponseOnItemRequestDto> getRequests(long userId, int from, int size) {
-        if (from < 0 || size < 0) {
-            throw new ValidException("Отрицательное число from или size");
-        }
-
-        List<ResponseOnItemRequestDto> requestDtos = RequestMapper.toResponseOnRequestList(requestRepository.findRequestsByRequestorIsNotOrderByCreatedDesc
+        List<Request> requests = requestRepository.findRequestsByRequestorIsNotOrderByCreatedDesc
                 (UserMapper.toUser(userService.getUser(userId)),
-                        PageRequest.of(from / size, size, Sort.by("created"))).toList());
-        for (ResponseOnItemRequestDto r : requestDtos){
-            r.setItems(itemService.findItemByRequest(r.getId()));
-        }
+                        PageRequest.of(from / size, size, Sort.by("created"))).toList();
 
-        return requestDtos;
+        return addItemsInRequests(requests);
     }
 
     public ResponseOnItemRequestDto getRequestById(long requestId, long userId) {
-        if (!userService.validation(userId)){
+        if (!userService.validation(userId)) {
             throw new ValidationException("Пользователь не найден");
         }
-        ResponseOnItemRequestDto requestDto = RequestMapper.toResponseOnRequest(requestRepository.findById(requestId).orElseThrow(() -> new ValidationException("Запрос не существует")));
+        ResponseOnItemRequestDto requestDto = RequestMapper.toResponseOnRequest(
+                requestRepository.findById(requestId).orElseThrow(() -> new ValidationException("Запрос не существует")));
         requestDto.setItems(itemService.findItemByRequest(requestId));
         return requestDto;
+    }
+
+    private List<ResponseOnItemRequestDto> addItemsInRequests(List<Request> requests) {
+        Map<Request, List<Item>> map = itemService.findItemByRequest(requests);
+
+        List<ResponseOnItemRequestDto> requestDtos = new ArrayList<>();
+        for (Request r : requests) {
+            ResponseOnItemRequestDto requestDto = RequestMapper.toResponseOnRequest(r);
+            requestDto.setItems(new ArrayList<>());
+            if (map.containsKey(r)) {
+                requestDto.setItems(ItemMapper.itemDtoList(map.get(r)));
+            }
+            requestDtos.add(requestDto);
+        }
+        return requestDtos;
     }
 }

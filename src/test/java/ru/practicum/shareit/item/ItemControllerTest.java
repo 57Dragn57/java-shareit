@@ -181,6 +181,22 @@ class ItemControllerTest {
     }
 
     @Test
+    void getItemsByUser_thenStatusIsBadRequest() throws Exception {
+        long userId = 1L;
+        int from = 0;
+        int size = -5;
+
+        mockMvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("from", "0")
+                        .param("size", "-5"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(itemService, Mockito.never()).getItemsByUser(userId, from, size);
+    }
+
+    @Test
     void search_thenStatusIsOk() throws Exception {
         String text = "отвертка";
         int from = 0;
@@ -194,5 +210,21 @@ class ItemControllerTest {
                 .andExpect(status().isOk());
 
         Mockito.verify(itemService).search(text, from, size);
+    }
+
+    @Test
+    void search_thenStatusIsBadRequest() throws Exception {
+        String text = "отвертка";
+        int from = -1;
+        int size = 5;
+
+        mockMvc.perform(get("/items/search")
+                        .param("text", text)
+                        .param("from", "-1")
+                        .param("size", "5"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(itemService, Mockito.never()).search(text, from, size);
     }
 }

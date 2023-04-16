@@ -17,6 +17,8 @@ import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.RequestRepository;
+import ru.practicum.shareit.request.dto.Request;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -36,6 +38,7 @@ public class ItemService {
     private final UserService userService;
     private final BookingService bookingService;
     private final ItemRepository itemRepository;
+    private final RequestRepository requestRepository;
     private final CommentRepository commentRepository;
 
     @Transactional
@@ -43,6 +46,12 @@ public class ItemService {
         if (userService.validation(userId)) {
             Item item = ItemMapper.toItem(itemDtoRequest);
             item.setOwner(UserMapper.toUser(userService.getUser(userId)));
+
+            if (itemDtoRequest.getRequestId() != 0) {
+                item.setRequests(requestRepository.findById(itemDtoRequest.getRequestId())
+                        .orElseThrow(() -> new ValidException("Запроса с таким id несуществует")));
+            }
+
             return ItemMapper.toItemDto(itemRepository.save(item));
         }
         throw new ValidationException("Пользователя не существует");
@@ -105,10 +114,6 @@ public class ItemService {
     }
 
     public List<ItemDtoResponse> getItemsByUser(long id, int from, int size) {
-        if (from < 0 || size < 0) {
-            throw new ValidException("Отрицательное число from или size");
-        }
-
         List<Item> items = itemRepository.findByOwnerId(id, PageRequest.of(from / size, size)).toList();
         List<ItemDtoResponse> itemsDto = new ArrayList<>();
 
@@ -145,15 +150,16 @@ public class ItemService {
     }
 
     public List<ItemDtoResponse> search(String text, int from, int size) {
-        if (from < 0 || size < 0) {
-            throw new ValidException("Отрицательное число from или size");
-        }
-
         return ItemMapper.itemDtoList(
                 itemRepository.findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text, PageRequest.of(from / size, size)).toList());
     }
 
-    public List<ItemDtoResponse> findItemByRequest(long requestId){
+    public List<ItemDtoResponse> findItemByRequest(long requestId) {
         return ItemMapper.itemDtoList(itemRepository.findItemsByRequests(requestId));
+    }
+
+    public Map<Request, List<Item>> findItemByRequest(List<Request> requests) {
+        return itemRepository.findByRequestsIn(requests, Sort.by("id")).stream()
+                .collect(groupingBy(Item::getRequests, toList()));
     }
 }

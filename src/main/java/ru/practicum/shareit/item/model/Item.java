@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.request.dto.Request;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
@@ -23,7 +24,9 @@ public class Item {
     @ManyToOne(optional = false)
     @JoinColumn(name = "owner", nullable = false)
     private User owner;
-    private long requests;
+    @ManyToOne
+    @JoinColumn(name = "requests")
+    private Request requests;
 
     @Override
     public boolean equals(Object obj) {

@@ -3,17 +3,20 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 public class BookingController {
     private BookingService bookingService;
@@ -48,7 +51,7 @@ public class BookingController {
     @GetMapping
     public List<BookingDtoResponse> findBookingsByBookerState(@RequestParam(defaultValue = "ALL") String state,
                                                               @RequestHeader("X-Sharer-User-Id") long userId,
-                                                              @Positive @RequestParam(defaultValue = "0") int from,
+                                                              @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                                               @Positive @RequestParam(defaultValue = "5") int size) {
         log.info("Получение списка бронирований со статусом {}", state);
         return bookingService.findBookingsListByBooker(state, userId, from, size);
@@ -57,7 +60,7 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDtoResponse> findBookingsByOwnerState(@RequestParam(defaultValue = "ALL") String state,
                                                              @RequestHeader("X-Sharer-User-Id") long userId,
-                                                             @Positive @RequestParam(defaultValue = "0") int from,
+                                                             @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                                              @Positive @RequestParam(defaultValue = "5") int size) {
         log.info("Получение списка бронирований со статусом {}", state);
         return bookingService.findBookingsListByOwner(state, userId, from, size);
