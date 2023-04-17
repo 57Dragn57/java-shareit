@@ -83,10 +83,10 @@ public class BookingService {
                         return BookingMapper.bookingDtoList(bookingRepository.findBookingsByBookerIdOrderByStartDesc(bookerId,
                                 PageRequest.of(from / size, size)).toList());
                     case CURRENT:
-                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByBooker(bookerId, now, "APPROVED",
+                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByBooker(bookerId, now, BookingStatus.APPROVED.name(),
                                 PageRequest.of(from / size, size)).toList());
                     case PAST:
-                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByBooker(bookerId, now, "APPROVED",
+                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByBooker(bookerId, now, BookingStatus.APPROVED.name(),
                                 PageRequest.of(from / size, size)).toList());
                     case FUTURE:
                         return BookingMapper.bookingDtoList(bookingRepository.findFutureBookingsByBooker(bookerId, now,
@@ -120,19 +120,19 @@ public class BookingService {
                         return BookingMapper.bookingDtoList(bookingRepository.findAllBookingsByOwners(ownerId,
                                 PageRequest.of(from / size, size)).toList());
                     case CURRENT:
-                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByOwner(ownerId, now, "APPROVED",
+                        return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByOwner(ownerId, now, BookingStatus.APPROVED.name(),
                                 PageRequest.of(from / size, size)).toList());
                     case PAST:
-                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByOwner(ownerId, now, "APPROVED",
+                        return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByOwner(ownerId, now, BookingStatus.APPROVED.name(),
                                 PageRequest.of(from / size, size)).toList());
                     case FUTURE:
                         return BookingMapper.bookingDtoList(bookingRepository.findFutureBookingsByOwner(ownerId, now,
                                 PageRequest.of(from / size, size)).toList());
                     case WAITING:
-                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, "WAITING",
+                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, BookingStatus.WAITING.name(),
                                 PageRequest.of(from / size, size)).toList());
                     case REJECTED:
-                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, "REJECTED",
+                        return BookingMapper.bookingDtoList(bookingRepository.findOwnersBookingsByStatus(ownerId, BookingStatus.REJECTED.name(),
                                 PageRequest.of(from / size, size)).toList());
                     default:
                         throw new ValidException("Unknown state: " + state);

@@ -63,10 +63,7 @@ public class RequestService {
         List<ResponseOnItemRequestDto> requestDtos = new ArrayList<>();
         for (Request r : requests) {
             ResponseOnItemRequestDto requestDto = RequestMapper.toResponseOnRequest(r);
-            requestDto.setItems(new ArrayList<>());
-            if (map.containsKey(r)) {
-                requestDto.setItems(ItemMapper.itemDtoList(map.get(r)));
-            }
+            requestDto.setItems(ItemMapper.itemDtoList(map.getOrDefault(r, List.of())));
             requestDtos.add(requestDto);
         }
         return requestDtos;
