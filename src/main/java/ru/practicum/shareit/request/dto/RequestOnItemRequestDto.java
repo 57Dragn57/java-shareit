@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.comment;
+package ru.practicum.shareit.request.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,9 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class CommentDtoRequest {
-    private long id;
+@NoArgsConstructor
+public class RequestOnItemRequestDto {
     @NotBlank
-    private String text;
+    private String description;
 }

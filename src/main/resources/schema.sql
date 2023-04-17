@@ -6,6 +6,14 @@ create table if not exists users
 );
 create unique index if not exists USER_EMAIL_UINDEX on USERS (email);
 
+create table if not exists requests
+(
+    id          long generated always as identity primary key,
+    description varchar(300),
+    requestor   long references USERS,
+    created     timestamp without time zone
+);
+
 create table if not exists items
 (
     id          long generated always as identity primary key,
@@ -13,7 +21,7 @@ create table if not exists items
     description varchar(200) not null,
     available   boolean,
     owner       long references users,
-    request     long
+    requests    long references requests
 );
 
 create table if not exists bookings
@@ -33,4 +41,5 @@ create table if not exists comments
     item_id   long references ITEMS,
     author_id long references USERS,
     created   timestamp without time zone
-)
+);
+
