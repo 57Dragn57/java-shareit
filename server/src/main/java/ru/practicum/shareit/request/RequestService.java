@@ -44,7 +44,7 @@ public class RequestService {
         return addItemsInRequests(requests);
     }
 
-    public ResponseOnItemRequestDto getRequestById(long requestId, long userId) {
+    public ResponseOnItemRequestDto getRequestById(long userId, long requestId) {
         if (!userService.validation(userId)) {
             throw new ValidationException("Пользователь не найден");
         }
