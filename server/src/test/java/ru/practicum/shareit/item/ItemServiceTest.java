@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.exception.ValidException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -145,7 +146,7 @@ class ItemServiceTest {
         int size = 5;
 
         assertThrows(NullPointerException.class, () -> itemService.getItemsByUser(itemId, from, size));
-        verify(itemRepository).findByOwnerId(anyLong(), eq(PageRequest.of(from / size, size)));
+        verify(itemRepository).findByOwnerId(anyLong(), eq(PageRequest.of(from / size, size, Sort.by(Sort.Direction.ASC, "id"))));
     }
 
     @Test

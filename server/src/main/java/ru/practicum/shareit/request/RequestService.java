@@ -24,6 +24,7 @@ public class RequestService {
     private final ItemService itemService;
     private final UserService userService;
 
+    @Transactional
     public ResponseOnItemRequestDto createRequest(RequestOnItemRequestDto requestDto, long requestorId) {
         Request request = RequestMapper.toRequest(requestDto);
         request.setRequestor(UserMapper.toUser(userService.getUser(requestorId)));

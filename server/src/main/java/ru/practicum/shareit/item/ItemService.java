@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.*;
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
@@ -108,7 +109,7 @@ public class ItemService {
     }
 
     public List<ItemDtoResponse> getItemsByUser(long id, int from, int size) {
-        List<Item> items = itemRepository.findByOwnerId(id, PageRequest.of(from / size, size)).toList();
+        List<Item> items = itemRepository.findByOwnerId(id, PageRequest.of(from / size, size, Sort.by(ASC, "id"))).toList();
         List<ItemDtoResponse> itemsDto = new ArrayList<>();
 
         Map<Item, List<Comment>> comments = commentRepository.findByItemIn(items, Sort.by(DESC, "created"))
