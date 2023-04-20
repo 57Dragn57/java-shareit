@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ValidException;
@@ -81,7 +80,7 @@ public class BookingService {
                                 PageRequest.of(from / size, size)).toList());
                     case CURRENT:
                         return BookingMapper.bookingDtoList(bookingRepository.findCurrentBookingsByBooker(bookerId, now, BookingStatus.APPROVED.name(),
-                                PageRequest.of(from / size, size, Sort.by(Sort.Direction.ASC, "id"))).toList());
+                                PageRequest.of(from / size, size)).toList());
                     case PAST:
                         return BookingMapper.bookingDtoList(bookingRepository.findPastBookingsByBooker(bookerId, now, BookingStatus.APPROVED.name(),
                                 PageRequest.of(from / size, size)).toList());

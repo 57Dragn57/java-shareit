@@ -1,7 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -12,14 +10,13 @@ import ru.practicum.shareit.validated.Update;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.List;
 
 @RestController
-@Slf4j
 @Validated
 @RequestMapping("/items")
-@RequiredArgsConstructor
 public class ItemController {
-    private ItemClient itemClient;
+    private final ItemClient itemClient;
 
     @Autowired
     public ItemController(ItemClient itemClient) {
@@ -65,6 +62,9 @@ public class ItemController {
     public ResponseEntity<Object> search(@RequestParam String text,
                                          @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                          @Positive @RequestParam(defaultValue = "5") int size) {
+        if (text.isBlank()) {
+            return ResponseEntity.ok(List.of());
+        }
         return itemClient.search(text, from, size);
     }
 }

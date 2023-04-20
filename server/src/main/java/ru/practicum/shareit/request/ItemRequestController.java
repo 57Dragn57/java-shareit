@@ -6,9 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -25,7 +22,7 @@ public class ItemRequestController {
     }
 
     @PostMapping
-    public ResponseOnItemRequestDto createRequest(@Valid @RequestBody RequestOnItemRequestDto requestDto, @RequestHeader("X-Sharer-User-Id") long requestorId) {
+    public ResponseOnItemRequestDto createRequest(@RequestBody RequestOnItemRequestDto requestDto, @RequestHeader("X-Sharer-User-Id") long requestorId) {
         log.info("Создание запроса");
         return requestService.createRequest(requestDto, requestorId);
     }
@@ -38,8 +35,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ResponseOnItemRequestDto> getRequestPage(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                         @PositiveOrZero @RequestParam(defaultValue = "0") int from,
-                                                         @Positive @RequestParam(defaultValue = "5") int size) {
+                                                         @RequestParam(defaultValue = "0") int from,
+                                                         @RequestParam(defaultValue = "5") int size) {
         log.info("Получение страницы с запросами");
         return requestService.getRequests(userId, from, size);
     }

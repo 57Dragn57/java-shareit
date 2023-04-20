@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exception.ValidException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -48,7 +49,8 @@ public class BookingController {
                                                             @RequestHeader("X-Sharer-User-Id") long userId,
                                                             @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                                             @Positive @RequestParam(defaultValue = "5") int size) {
-        return bookingClient.findBookingsListByBooker(state, userId, from, size);
+        BookingState validState = BookingState.from(state).orElseThrow(() -> new ValidException("Unknown state: " + state));
+        return bookingClient.findBookingsListByBooker(validState.name(), userId, from, size);
     }
 
     @GetMapping("/owner")
@@ -56,6 +58,7 @@ public class BookingController {
                                                            @RequestHeader("X-Sharer-User-Id") long userId,
                                                            @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                                            @Positive @RequestParam(defaultValue = "5") int size) {
-        return bookingClient.findBookingsListByOwner(state, userId, from, size);
+        BookingState validState = BookingState.from(state).orElseThrow(() -> new ValidException("Unknown state: " + state));
+        return bookingClient.findBookingsListByOwner(validState.name(), userId, from, size);
     }
 }

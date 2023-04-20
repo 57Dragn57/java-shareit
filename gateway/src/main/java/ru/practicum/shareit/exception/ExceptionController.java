@@ -7,23 +7,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
 public class ExceptionController {
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ValidationException.class)
-    public void validationException(ValidationException e) {
-        log.info(e.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(ServerErrorException.class)
-    public void serverErrorException(ServerErrorException e) {
-        log.info(e.getMessage());
-    }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
@@ -42,5 +31,11 @@ public class ExceptionController {
     public Map<String, String> validException(ValidException e) {
         log.info(e.getMessage());
         return Map.of("error", e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public void methodPositiveOrZeroValid(ConstraintViolationException e) {
+        log.info(e.getMessage());
     }
 }
